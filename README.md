@@ -233,7 +233,7 @@ We applied TargetMosaic to **SpA**, a virulence factor of *S. aureus*:
   - ~**12%** retain partial capacity  
   - ~**10%** cannot be targeted  
 
-This demonstrates how TargetMosaic can guide **drug target prioritization** and **species coverage analysis**.  
+This demonstrates how TargetMosaic can guide **drug target prioritization** and species **diagnostic coverage** analysis.  
 
 ---
 
