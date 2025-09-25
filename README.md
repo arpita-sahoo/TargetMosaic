@@ -30,6 +30,29 @@ In your working directory:
 ```bash
 git clone https://github.com/arpita-sahoo/TargetMosaic.git
 ```
+## Environment setup  
+
+This repository requires a conda environment named `myenv`.  
+You can create it directly from the provided `environment.yml`:  
+
+```bash
+module load anaconda3   # if on a cluster with modules
+conda env create -f environment.yml
+conda activate myenv
+```
+If the environment already exists, update it with:
+```bash
+conda env update -f environment.yml --prune
+```
+### Alternative setup with pip  
+
+If you prefer a lightweight installation, a `requirements.txt` is also provided:  
+
+```bash
+conda create -n myenv python=3.10
+conda activate myenv
+pip install -r requirements.txt
+```
 ---
 
 ## Workflow  
@@ -61,7 +84,7 @@ TargetMosaic can be applied to **any target gene** in **any bacterial pathogen**
    - Assess whether domain loss affects druggability.  
 
 7. **Coverage summary**  
-   - Report percentage of strains fully targetable, partially targetable, or not targetable.  
+   - Report the percentage of strains fully targetable, partially targetable, or not targetable.  
 
 ---
 
@@ -73,33 +96,34 @@ TargetMosaic can be applied to **any target gene** in **any bacterial pathogen**
 ### Run download job  
 
 ```bash
-module load anaconda3
-source activate myenv
-sbatch TargetMosaic/download_single.slurm
+mkdir batch_download_faa
+cd batch_download_faa
+sbatch ../TargetMosaic/download_single.slurm
 ```
 ## Step 2. Flatten folder hierarchy  
 
 After downloads finish, flatten the directory structure.  
 
-From inside `batch_downloads/faa_files/`:  
-
 ```bash
-sbatch flatten_copy.slurm
+cd faa_files
+sbatch ../../TargetMosaic/flatten_copy.slurm
 ```
 ## Step 3. Target gene identification and coverage analysis  
 
-With all annotation files downloaded and flattened, the next step is to search for your **target gene** across strains.  
+With all annotation files downloaded and flattened, the next step is to search for your **target gene** across strains. 
+We can come back to the main working directory:
+```bash
+cd ../..
+```
 
-### Input files  
-- `target.fasta` – FASTA file containing the reference sequence(s) of your target gene.  
+### Input files required in the main working directory  
+- `WT.fasta` – FASTA file containing the reference sequence of your target gene.  
 - `faa_files/` – directory with all `.faa` annotation files from Step 2.  
 
 ### Run sequence search  
 
-Example command (adapt to your environment and tools):  
-
 ```bash
-sbatch extract_kmer_counter.slurm
+sbatch TargetMosaic/extract_kmer_counter.slurm
 ```
 This will produce:
 - `matches.fasta` – all sequences homologous to the target gene.
@@ -110,7 +134,7 @@ Summarize species coverage
 ```bash
 awk -F'\t' '$2 == 0 {count++} END {print count}' counts.tsv
 ```
-This provides the number of strains without the target. 
+This provides the number of strains without the target.  
 `$2 == 0` can be changed to `$2 == 1` to identify number of strains with one copy of the gene, and so on.
 
 ---
@@ -120,7 +144,9 @@ This provides the number of strains without the target.
 Collapse identical sequences into unique variants, annotated with their occurrence counts:  
 
 ```bash
-python unique_seq.py matches.fasta
+module load anaconda3
+source activate myenv
+python TargetMosaic/unique_seq.py matches.fasta
 ```
 
 Output:  
@@ -134,10 +160,10 @@ Output:
 
 ### Step 3.2 Multiple sequence alignment  
 
-Run multiple sequence alignment on unique variants:  
+Run multiple sequence alignments on unique variants:  
 
 ```bash
-sbatch run_clustalo.sbatch
+sbatch TargetMosaic/run_clustalo.sbatch
 ```
 
 Output:  
@@ -150,12 +176,17 @@ Output:
 Extract and analyze specific functional domains from the aligned sequences:  
 
 ```bash
-python domain_extraction.py --aligned unique_seq_aligned.fasta                             --domains domains.fasta                             --reference Var1_8302
+module load anaconda3
+source activate myenv
+python TargetMosaic/domain_extraction.py --aligned unique_seq_aligned.fasta --domains domains.fasta --reference Var1_x
 ```
+Replace `Var1_x` with whichever variant header corresponds to the reference sequence
+Replace `domains.fasta` with a fasta file containing sequence(s) of the domain(s) of interest
+
 
 Output:  
-- Domain-specific FASTA files (e.g., `signal_sequences.fasta`, `z_domains.fasta`).  
-- Summary of domain conservation across variants.  
+- Domain-specific FASTA file  
+- Summary of unique domain sequence variants with corresponding counts.  
 
 ---
 
@@ -163,8 +194,8 @@ Output:
 
 Combine gene presence/absence and domain analysis to classify strains:  
 - **Fully targetable** – gene present, with intact functional domains.  
-- **Partially targetable** – gene present, but missing or altered domains.  
-- **Not targetable** – gene absent.  
+- **Partially targetable** – gene present, but altered domains without loss of function.  
+- **Not targetable** – gene absent, or gene present with missing non-redundant domains.  
 
 ---
 
