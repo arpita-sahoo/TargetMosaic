@@ -93,6 +93,28 @@ TargetMosaic can be applied to **any target gene** in **any bacterial pathogen**
 ### Input files (in current working directory)  
 - `SAMID.tsv` – TSV file with all SAM IDs (one per line)   
 
+This Workflow uses the bakrep-cli tool; hence, the SAM IDs must be compatible with the bakrep database. To generate the TSV file:
+- Visit https://bakrep.computational.bio/browse
+- Enter appropriate filters. Important:
+     - Genome size: according to the species of interest
+     - Contigs: 1-200
+     - Completeness: 90-100%
+     - Contamination: 1-10%
+     - Species: full scientific name of the species of interest
+- Click `Export as TSV` and upload the exported metadata TSV file(bakrep-export.tsv) into your working directory
+- Extract the SAM IDs using:
+```bash
+module load anaconda3
+source activate myenv
+python TargetMosaic/extract_SAMid.py Pseudomonas aeruginosa
+```
+Optionally with custom input/output:
+```bash
+module load anaconda3
+source activate myenv
+python TargetMosaic/extract_SAMid.py Escherichia coli -i bakrep-export.tsv -o SAMID.tsv
+```
+
 ### Run download job  
 
 ```bash
