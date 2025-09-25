@@ -9,6 +9,6 @@
 
 module load anaconda3
 source activate myenv
-python extract_protein_kmer.py --input WT.fasta --dir ./faa_files/ --out_fasta matches.fasta --out_counts counts.tsv --k 5 --threshold 0.75
+python TargetMosaic/extract_protein_kmer.py --input WT.fasta --dir ./faa_files/ --out_fasta matches.fasta --out_counts counts.tsv --k 5 --threshold 0.75
 
 echo "Extraction and counting finished!"
