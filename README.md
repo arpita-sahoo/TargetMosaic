@@ -1,4 +1,5 @@
-# TargetMosaic  
+
+<img width="8803" height="2602" alt="TargetMosaic_3" src="https://github.com/user-attachments/assets/1c5bdfb6-6ffc-4450-8344-3970cc70cdf2" />
 
 **TargetMosaic** is a workflow for downloading bacterial whole-genome annotations, identifying target proteins from a reference FASTA, and analyzing their sequence coverage across the pathogen species of interest.  
 This helps evaluate the potential of a protein as a **drug target** or **binder target**, facilitating scientific contributions to precision medicine and targeted diagnostics.  
