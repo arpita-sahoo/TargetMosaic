@@ -123,6 +123,13 @@ mkdir batch_download_faa
 cd batch_download_faa
 sbatch ../TargetMosaic/download_single.slurm
 ```
+After the job is complete, check the number of files that were downloaded:
+```bash
+find ./faa_files -type f | wc -l
+```
+The output should be equal to the number of entries in SAMID.tsv
+If not, there was a problem with the download job; rerun it.
+
 ## Step 2. Flatten folder hierarchy  
 
 After downloads finish, flatten the directory structure.  
