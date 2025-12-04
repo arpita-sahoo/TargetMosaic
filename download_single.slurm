@@ -7,7 +7,8 @@
 #SBATCH --mem=32G
 #SBATCH --partition=standard
 
-module load anaconda3
+module load miniforge3
+# module load anaconda3
 source activate myenv
 
 # Download directory in current folder
