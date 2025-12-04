@@ -8,8 +8,9 @@
 #SBATCH --output=clustalo_%j.out
 #SBATCH --error=clustalo_%j.err
 
-# Activate your conda environment
-module load anaconda3
+# Activate your environment
+module load miniforge3
+# module load anaconda3
 source activate myenv
 
 # Input & output
