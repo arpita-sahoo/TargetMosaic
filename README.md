@@ -37,7 +37,7 @@ This repository requires a conda environment named `myenv`.
 You can create it directly from the provided `environment.yml`:  
 
 ```bash
-module load anaconda3   # if on a cluster with modules
+module load miniforge3   # if on a cluster with modules
 conda env create -f environment.yml
 conda activate myenv
 ```
@@ -105,13 +105,13 @@ This Workflow uses the bakrep-cli tool; hence, the SAM IDs must be compatible wi
 - Click `Export as TSV` and upload the exported metadata TSV file(bakrep-export.tsv) into your working directory
 - Extract the SAM IDs using:
 ```bash
-module load anaconda3
+module load miniforge3
 source activate myenv
 python TargetMosaic/extract_SAMid.py Pseudomonas aeruginosa
 ```
 Optionally with custom input/output:
 ```bash
-module load anaconda3
+module load miniforge3
 source activate myenv
 python TargetMosaic/extract_SAMid.py Escherichia coli -i bakrep-export.tsv -o SAMID.tsv
 ```
@@ -127,7 +127,7 @@ After the job is complete, check the number of files that were downloaded:
 ```bash
 find ./faa_files -type f | wc -l
 ```
-The output should be equal to the number of entries in SAMID.tsv
+The output should be equal to the number of entries in SAMID.tsv plus the number of log files
 If not, there was a problem with the download job; rerun it.
 
 ## Step 2. Flatten folder hierarchy  
@@ -174,7 +174,7 @@ This provides the number of strains without the target.
 Collapse identical sequences into unique variants, annotated with their occurrence counts:  
 
 ```bash
-module load anaconda3
+module load miniforge3
 source activate myenv
 python TargetMosaic/unique_seq.py matches.fasta
 ```
@@ -206,7 +206,7 @@ Output:
 Extract and analyze specific functional domains from the aligned sequences:  
 
 ```bash
-module load anaconda3
+module load miniforge3
 source activate myenv
 python TargetMosaic/domain_extraction.py --aligned unique_seq_aligned.fasta --domains domains.fasta --reference Var1_x
 ```
