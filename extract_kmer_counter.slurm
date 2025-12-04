@@ -7,7 +7,8 @@
 #SBATCH --mem=32G
 #SBATCH --partition=standard
 
-module load anaconda3
+module load miniforge3
+# module load anaconda3
 source activate myenv
 python TargetMosaic/extract_protein_kmer.py --input WT.fasta --dir ./faa_files/ --out_fasta matches.fasta --out_counts counts.tsv --k 5 --threshold 0.75
 
