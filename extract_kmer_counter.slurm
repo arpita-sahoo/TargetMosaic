@@ -6,6 +6,8 @@
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=32G
 #SBATCH --partition=standard
+##SBATCH --mail-user=user@example.com
+##SBATCH --mail-type=BEGIN,END 
 
 module load miniforge3
 # module load anaconda3
