@@ -54,6 +54,14 @@ conda create -n myenv python=3.10
 conda activate myenv
 pip install -r requirements.txt
 ```
+
+### Email notification of job run completion  
+
+If you prefer to be notified when the Slurm jobs are complete, feel free to change `user@example.com` to your email in the 3 Slurm scripts: `download_single.slurm`, `flatten_copy.slurm`, `extract_kmer_counter.slurm`
+```bash
+##SBATCH --mail-user=user@example.com
+```
+
 ---
 
 ## Workflow  
