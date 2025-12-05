@@ -7,6 +7,8 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=16G
+##SBATCH --mail-user=user@example.com
+##SBATCH --mail-type=BEGIN,END 
 
 DEST="../../faa_files"
 
