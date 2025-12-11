@@ -4,6 +4,10 @@ import csv
 from Bio import SeqIO
 from Bio.SeqRecord import SeqRecord
 from Bio.SeqIO import write
+from concurrent.futures import ProcessPoolExecutor
+import multiprocessing
+import tempfile
+import shutil
 
 
 def parse_faa(file_path):
@@ -38,40 +42,83 @@ def kmer_similarity(seq1, seq2, k=5):
     return intersection / union if union > 0 else 0.0
 
 
-def search_similar_sequences(input_fasta, faa_file, output_fasta="matches.fasta", output_counts="counts.tsv", k=5, threshold=0.9):
+def search_similar_sequences(input_fasta, faa_file, k=5, threshold=0.9):
+    """Search a single FAA file, return results instead of writing to disk."""
     query = read_fasta(input_fasta)
     query_seq = str(query.seq)
 
     sam_id = os.path.basename(faa_file).split(".")[0]
 
-    print(f"\nSearching in {faa_file} for sequences ≥{threshold*100:.1f}% similar to query {query.id}\n")
-
     matches = []
+    count = 0
+
     for record in parse_faa(faa_file):
         target_seq = str(record.seq)
         sim = kmer_similarity(query_seq, target_seq, k=k)
         if sim >= threshold:
             new_id = f"{sam_id}_{record.id}|similarity={sim:.2f}"
-            # print(f">{new_id}")
-            # print(record.seq)
             matches.append(SeqRecord(record.seq, id=new_id, description=""))
+            count += 1
 
-    if matches:
-        with open(output_fasta, "a") as out_f:
-            write(matches, out_f, "fasta")
-        with open(output_counts, 'a', newline='') as tsvfile:
-            writer = csv.writer(tsvfile, delimiter='\t', lineterminator='\n')
-            writer.writerow([sam_id, len(matches)])
-    else:
-        with open(output_counts, 'a', newline='') as tsvfile:
-            writer = csv.writer(tsvfile, delimiter='\t', lineterminator='\n')
-            writer.writerow([sam_id, "0"])
+    return sam_id, matches, count
+
+
+def process_file(args):
+    """Wrapper for parallel processing."""
+    input_fasta, faa_file, k, threshold = args
+    return search_similar_sequences(input_fasta, faa_file, k=k, threshold=threshold)
+
 
 def search_directory(input_fasta, directory, output_fasta, output_counts, k=5, threshold=0.9):
-    for file in os.listdir(directory):
-        if file.endswith(".faa") or file.endswith(".faa.gz"):
-            faa_path = os.path.join(directory, file)
-            search_similar_sequences(input_fasta, faa_path, output_fasta=output_fasta, output_counts=output_counts, k=k, threshold=threshold)
+    """Process all FAA files in parallel and write outputs safely."""
+    faa_files = [
+        os.path.join(directory, f)
+        for f in os.listdir(directory)
+        if f.endswith(".faa") or f.endswith(".faa.gz")
+    ]
+
+    if not faa_files:
+        print("No FAA files found in directory.")
+        return
+
+    tasks = [(input_fasta, faa_path, k, threshold) for faa_path in faa_files]
+
+    num_workers = multiprocessing.cpu_count()
+    print(f"Running in parallel with {num_workers} workers...")
+
+    # Use temporary files to avoid race conditions
+    temp_dir = tempfile.mkdtemp()
+
+    results = []
+    with ProcessPoolExecutor(max_workers=num_workers) as executor:
+        for sam_id, matches, count in executor.map(process_file, tasks):
+            # Save temporary fasta
+            if matches:
+                temp_fasta = os.path.join(temp_dir, f"{sam_id}_matches.fasta")
+                with open(temp_fasta, "w") as out_f:
+                    write(matches, out_f, "fasta")
+            # Save temporary counts
+            temp_count = os.path.join(temp_dir, f"{sam_id}_counts.tsv")
+            with open(temp_count, "w", newline="") as tsvfile:
+                writer = csv.writer(tsvfile, delimiter="\t", lineterminator="\n")
+                writer.writerow([sam_id, count])
+
+    # Merge temporary files into final outputs
+    with open(output_fasta, "w") as out_f:
+        for f in os.listdir(temp_dir):
+            if f.endswith("_matches.fasta"):
+                with open(os.path.join(temp_dir, f)) as tmp_f:
+                    out_f.write(tmp_f.read())
+
+    with open(output_counts, "w", newline="") as out_counts:
+        for f in os.listdir(temp_dir):
+            if f.endswith("_counts.tsv"):
+                with open(os.path.join(temp_dir, f)) as tmp_f:
+                    out_counts.write(tmp_f.read())
+
+    # Clean up
+    shutil.rmtree(temp_dir)
+    print(f"Processing complete. Results written to {output_fasta} and {output_counts}.")
 
 
 if __name__ == "__main__":
@@ -81,28 +128,25 @@ if __name__ == "__main__":
     parser.add_argument("--input", required=True, help="Input protein FASTA file")
     parser.add_argument("--faa", help="Single FAA file (.faa or .faa.gz)")
     parser.add_argument("--dir", help="Directory containing multiple FAA files")
-    parser.add_argument("--out_fasta", required=True, help="Output FASTA file for matches(default=matches.fasta)")
-    parser.add_argument("--out_counts", required=True, help="Output Counts file for SAM IDs (default=counts.tsv)")
+    parser.add_argument("--out_fasta", required=True, help="Output FASTA file for matches")
+    parser.add_argument("--out_counts", required=True, help="Output Counts file for SAM IDs")
     parser.add_argument("--k", type=int, default=5, help="K-mer size (default=5)")
     parser.add_argument("--threshold", type=float, default=0.9, help="Similarity threshold (default=0.9)")
 
     args = parser.parse_args()
 
-    # Clear output file before writing
-    open(args.out_fasta, "w").close()
-    open(args.out_counts, "w").close()
-
     if args.faa:
-        search_similar_sequences(args.input, args.faa, args.out_fasta, args.out_counts, k=args.k, threshold=args.threshold)
+        sam_id, matches, count = search_similar_sequences(args.input, args.faa, k=args.k, threshold=args.threshold)
+        # Write results
+        if matches:
+            with open(args.out_fasta, "w") as out_f:
+                write(matches, out_f, "fasta")
+        with open(args.out_counts, "w", newline="") as tsvfile:
+            writer = csv.writer(tsvfile, delimiter="\t", lineterminator="\n")
+            writer.writerow([sam_id, count])
+        print(f"Processing complete. Results written to {args.out_fasta} and {args.out_counts}.")
+
     elif args.dir:
         search_directory(args.input, args.dir, args.out_fasta, args.out_counts, k=args.k, threshold=args.threshold)
     else:
         raise ValueError("You must provide either --faa (file) or --dir (directory)")
-
-
-
-"""
-## usage
-python extract_protein_kmer.py --input 	Tsx_WT.fasta --dir ./faa_test/ --out_fasta matches.fasta --out_counts counts.tsv --k 5 --threshold 0.75
-
-"""
