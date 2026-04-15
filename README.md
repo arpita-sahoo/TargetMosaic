@@ -175,6 +175,15 @@ awk -F'\t' '$2 == 0 {count++} END {print count}' counts.tsv
 This provides the number of strains without the target.  
 `$2 == 0` can be changed to `$2 == 1` to identify number of strains with one copy of the gene, and so on.
 
+**Side Note:** If you are further interested in the sequences from the assemblies that have multiple copies of your target, you can try running the following:
+```bash
+awk -F'\t' '$NF==2 || $NF==3 || $NF==4 {print $1}' counts.tsv > ids.txt
+seqkit grep -r -f ids.txt matches.fasta > multicopy_seq.fasta
+```
+This will produce:
+- `ids.txt` – All assembly ids having multiple copies of the target
+- `multicopy_seq.fasta` – Fasta file with all the multiple copies of the target from different assemblies. Sequences belonging to the same assembly can be identified by the header
+
 ---
 
 ### Step 3.1 Extract unique variants  
