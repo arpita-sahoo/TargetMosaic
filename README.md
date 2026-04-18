@@ -163,12 +163,16 @@ cd ../..
 ```bash
 sbatch TargetMosaic/extract_kmer_counter.slurm
 ```
-This will produce:
-- `matches.fasta` – all sequences homologous to the target gene.
-- `counts.tsv` – table with per-strain presence/absence/duplication counts.
+This will produce for each "threshold" tested:
+- `matches_threshold.fasta` – all sequences homologous to the target gene.
+- `counts_threshold.tsv` – table with per-strain presence/absence/duplication counts.
 
-Summarize species coverage
-# Count number of strains without the target gene
+Currently we are testing `thresholds=(0.10 0.25 0.50 0.75 0.90)`
+
+However, this can be changed if needed in `extract_kmer_counter.slurm`
+
+### Summarize species coverage
+Count number of strains without the target gene:
 ```bash
 awk -F'\t' '$2 == 0 {count++} END {print count}' counts.tsv
 ```
@@ -181,7 +185,7 @@ awk -F'\t' '$NF==2 || $NF==3 || $NF==4 {print $1}' counts.tsv > ids.txt
 seqkit grep -r -f ids.txt matches.fasta > multicopy_seq.fasta
 ```
 This will produce:
-- `ids.txt` – All assembly ids having multiple copies of the target
+- `ids.txt` – All assembly ids having multiple copies (2, 3 and 4) of the target
 - `multicopy_seq.fasta` – Fasta file with all the multiple copies of the target from different assemblies. Sequences belonging to the same assembly can be identified by the header
 
 ---
