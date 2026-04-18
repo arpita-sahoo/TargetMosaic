@@ -12,6 +12,27 @@
 module load miniforge3
 # module load anaconda3
 source activate myenv
-python TargetMosaic/extract_protein_kmer.py --input WT.fasta --dir ./faa_files/ --out_fasta matches.fasta --out_counts counts.tsv --k 5 --threshold 0.75
 
+# thresholds to test
+thresholds=(0.10 0.25 0.50 0.75 0.90)
+
+for t in "${thresholds[@]}"
+do
+    # remove decimal point for cleaner filenames (e.g., 0.75 -> 75)
+    t_label=$(echo $t | awk '{printf "%d", $1*100}')
+
+    echo "Running threshold $t"
+
+    python TargetMosaic/extract_protein_kmer.py \
+        --input WT.fasta \
+        --dir ./faa_files/ \
+        --out_fasta matches_${t_label}.fasta \
+        --out_counts counts_${t_label}.tsv \
+        --k 5 \
+        --threshold $t
+
+    echo "Finished threshold $t"
+done
+
+echo "All runs completed!"
 echo "Extraction and counting finished!"
