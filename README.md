@@ -57,7 +57,7 @@ pip install -r requirements.txt
 
 ### Email notification of job run completion  
 
-If you prefer to be notified when the Slurm jobs are complete, feel free to change `user@example.com` to your email in the 3 Slurm scripts: `download_single.slurm`, `flatten_copy.slurm`, `extract_kmer_counter.slurm`
+If you prefer to be notified when the Slurm jobs are complete, feel free to change `user@example.com` to your email in the 3 Slurm scripts: `download_single.sh`, `flatten_copy.sh`, `extract_kmer_counter.sh`
 ```bash
 ##SBATCH --mail-user=user@example.com
 ```
@@ -129,7 +129,7 @@ python TargetMosaic/extract_SAMid.py Escherichia coli -i bakrep-export.tsv -o SA
 ```bash
 mkdir batch_download_faa
 cd batch_download_faa
-sbatch ../TargetMosaic/download_single.slurm
+sbatch ../TargetMosaic/download_single.sh
 ```
 After the job is complete, check the number of files that were downloaded:
 ```bash
@@ -144,7 +144,7 @@ After downloads finish, flatten the directory structure.
 
 ```bash
 cd faa_files
-sbatch ../../TargetMosaic/flatten_copy.slurm
+sbatch ../../TargetMosaic/flatten_copy.sh
 ```
 ## Step 3. Target gene identification and coverage analysis  
 
@@ -161,7 +161,7 @@ cd ../..
 ### Run sequence search  
 
 ```bash
-sbatch TargetMosaic/extract_kmer_counter.slurm
+sbatch TargetMosaic/extract_kmer_counter.sh
 ```
 This will produce for each "threshold" tested:
 - `matches_threshold.fasta` – all sequences homologous to the target gene.
@@ -169,7 +169,7 @@ This will produce for each "threshold" tested:
 
 Currently we are testing `thresholds=(0.10 0.25 0.50 0.75 0.90)`
 
-However, this can be changed if needed in `extract_kmer_counter.slurm`
+However, this can be changed if needed in `extract_kmer_counter.sh`
 
 ### Summarize species coverage
 Count number of strains without the target gene:
@@ -214,7 +214,7 @@ Output:
 Run multiple sequence alignments on unique variants:  
 
 ```bash
-sbatch TargetMosaic/run_clustalo.sbatch
+sbatch TargetMosaic/run_clustalo.sh
 ```
 
 Output:  
