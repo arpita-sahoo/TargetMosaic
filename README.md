@@ -7,7 +7,7 @@ This helps evaluate the potential of a protein as a **drug target** or **binder 
 ---
 
 ## Features  
-- Parallel download of genome annotation files from NCBI using SLURM.  
+- Parallel download of genome annotation files from AllTheBacteria Database using SLURM.  
 - Automatic flattening of download directories.  
 - Target gene search against large genome collections.  
 - Strain coverage statistics (absent, present, duplicated).  
