@@ -15,7 +15,7 @@ source activate myenv
 # Input & output
 INPUT="unique_seq.fasta"
 OUTPUT_FASTA="unique_seq_aligned.fasta"
-OUTPUT_MATRIX="distmat.txt"
+OUTPUT_MATRIX="identity_matrix.txt"
 
 # Run Clustal Omega
 clustalo \
@@ -24,5 +24,5 @@ clustalo \
   --threads=$SLURM_CPUS_PER_TASK \
   --outfmt=fa \
   --distmat-out=$OUTPUT_MATRIX \
-  --percent-id
+  --percent-id \
   -v
