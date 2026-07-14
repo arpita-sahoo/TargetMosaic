@@ -10,17 +10,19 @@
 
 # Activate your environment
 module load miniforge3
-# module load anaconda3
 source activate myenv
 
 # Input & output
 INPUT="unique_seq.fasta"
-OUTPUT="unique_seq_aligned.fasta"
+OUTPUT_FASTA="unique_seq_aligned.fasta"
+OUTPUT_MATRIX="distmat.txt"
 
 # Run Clustal Omega
 clustalo \
   -i $INPUT \
-  -o $OUTPUT \
+  -o $OUTPUT_FASTA \
   --threads=$SLURM_CPUS_PER_TASK \
   --outfmt=fa \
+  --distmat-out=$OUTPUT_MATRIX \
+  --percent-id
   -v
