@@ -218,7 +218,22 @@ sbatch TargetMosaic/run_clustalo.sh
 ```
 
 Output:  
-- `unique_seq_aligned.fasta` – aligned FASTA file of all variants.  
+- `unique_seq_aligned.fasta` – aligned FASTA file of all variants.
+- `identity_matrix.txt` – Clustal omega identity matrix of all variants.
+
+**Side Note:** If you wish to check the identity matrix to exclude variants to be excluded from the downstream analysis that do not meet your required identity threshold, please use:
+```bash
+awk 'NF > 1 && $2 < ### {print $1 "\t" $2}' identity_matrix.txt > exclude.tsv
+```
+Where you can substitute `###` with your required identity threshold (e.g., 90). The first variant is assumed to be the reference.
+
+Once you have decided on your exclusion criteria, execute the following to exclude the entries:
+```bash
+module load miniforge3
+source activate myenv
+python TargetMosaic/remove_fasta_entries.py unique_seq_aligned.fasta exclude.tsv unique_seq_aligned_new.fasta
+```
+This will generate `unique_seq_aligned_new.fasta`, which can be used for subsequent analysis.
 
 ---
 
@@ -229,8 +244,9 @@ Extract and analyze specific functional domains from the aligned sequences:
 ```bash
 module load miniforge3
 source activate myenv
-python TargetMosaic/domain_extraction.py --aligned unique_seq_aligned.fasta --domains domains.fasta --reference Var1_x
+python TargetMosaic/domain_extraction.py --aligned aligned.fasta --domains domains.fasta --reference Var1_x
 ```
+Replace `aligned.fasta` with the desired alignment fasta file
 Replace `Var1_x` with whichever variant header corresponds to the reference sequence
 Replace `domains.fasta` with a fasta file containing sequence(s) of the domain(s) of interest
 
