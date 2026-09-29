@@ -52,7 +52,7 @@ def find_domain_positions(aligned_fasta, domains_fasta, reference_id):
 
     return domain_positions
 
-def extract_domains_from_alignment(aligned_fasta, domain_positions, fasta_out, csv_out, domain_name):
+def extract_domains_from_alignment(aligned_fasta, domain_positions, fasta_out, tsv_out, domain_name):
     """
     Extract domains from all sequences in an aligned FASTA.
 
@@ -101,7 +101,7 @@ def extract_domains_from_alignment(aligned_fasta, domain_positions, fasta_out, c
             variants.append(variant)
             total_occurrences += count
 
-        variants.sort()
+        variants.sort(key=lambda x: int(x.replace("Var", "")))
 
         results.append(
             (seq, variants, total_occurrences)
@@ -140,7 +140,7 @@ def extract_domains_from_alignment(aligned_fasta, domain_positions, fasta_out, c
     # Write CSV
     # --------------------------------------------------
 
-    with open(csv_out, "w") as out:
+    with open(tsv_out, "w") as out:
 
         out.write(
             "New_variant\t"
@@ -159,7 +159,7 @@ def extract_domains_from_alignment(aligned_fasta, domain_positions, fasta_out, c
                 f"{domain_name}_{variant_number}"
             )
 
-            original_variants = ",".join(variants)
+            original_variants = "\t".join(variants)
 
             out.write(
                 f"{new_variant}\t"
@@ -174,7 +174,7 @@ if __name__ == "__main__":
     parser.add_argument("--domains", required=True, help="FASTA file with reference domain sequences")
     parser.add_argument("--reference", required=True, help="Reference sequence ID in alignment")
     parser.add_argument("--fasta_out", help="Output FASTA file (optional)")
-    parser.add_argument("--csv_out", help="Output CSV file (optional)")
+    parser.add_argument("--tsv_out", help="Output CSV file (optional)")
 
     args = parser.parse_args()
 
@@ -182,7 +182,7 @@ if __name__ == "__main__":
     domain_basename = os.path.splitext(os.path.basename(args.domains))[0]
 
     fasta_out = args.fasta_out or f"extracted_domains_{domain_basename}.fasta"
-    csv_out = args.csv_out or f"extracted_domains_{domain_basename}.csv"
+    tsv_out = args.tsv_out or f"extracted_domains_{domain_basename}.tsv"
 
     # Step 1: find domain positions in alignment
     domain_positions = find_domain_positions(args.aligned, args.domains, args.reference)
@@ -191,5 +191,5 @@ if __name__ == "__main__":
         print(f"  {name}: {s}-{e}")
 
     # Step 2: extract, merge, and sort domain sequences
-    extract_domains_from_alignment(args.aligned, domain_positions, fasta_out, csv_out, domain_basename)
-    print(f"\nExtracted domains written to {fasta_out} and {csv_out}")
+    extract_domains_from_alignment(args.aligned, domain_positions, fasta_out, tsv_out, domain_basename)
+    print(f"\nExtracted domains written to {fasta_out} and {tsv_out}")
