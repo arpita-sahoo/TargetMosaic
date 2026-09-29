@@ -52,88 +52,121 @@ def find_domain_positions(aligned_fasta, domains_fasta, reference_id):
 
     return domain_positions
 
-
 def extract_domains_from_alignment(aligned_fasta, domain_positions, fasta_out, csv_out, domain_name):
     """
-    Extract domains from all sequences in an aligned FASTA,
-    group identical domain sequences, and merge headers.
-    Sorts variants alphabetically within each header, 
-    and final FASTA by total occurrences (descending).
+    Extract domains from all sequences in an aligned FASTA.
+
+    Identical ungapped domain sequences are grouped together.
+
+    FASTA headers:
+        >DOMAIN_variantnumber_occurrences
+
+    Example:
+        >ED_1_15234
+
+    CSV keeps the mapping between the new domain variants
+    and the original full-length variants.
     """
+
     grouped = defaultdict(list)
 
     # Parse aligned FASTA
     for record in SeqIO.parse(aligned_fasta, "fasta"):
         header = record.id
         seq = str(record.seq)
-        
-        # Extract all domain regions using alignment coordinates
+
+        # Extract domain regions using alignment coordinates
         extracted = "".join(
             seq[start - 1:end]
             for _, (start, end) in domain_positions.items()
         )
-        
+
         # Remove alignment gaps before grouping
-        extracted = extracted.replace("-", "")
+        extracted = extracted.replace("-", "").upper()
+
         grouped[extracted].append(header)
 
-    
     results = []
+
     for seq, headers in grouped.items():
         variants = []
         total_occurrences = 0
-        
+
         for h in headers:
             parts = h.split("_")
+
             variant = parts[0]
             count = int(parts[1]) if len(parts) > 1 else 1
-            
+
             variants.append(variant)
             total_occurrences += count
-            
+
         variants.sort()
-        results.append((seq, variants, total_occurrences))
 
-
-    # Sort by occurrence before assigning the new variant numbers
-    results.sort(key=lambda x: x[2], reverse=True)
-
-
-    # Write FASTA
-    with open(fasta_out, "w") as out:
-        for variant_number, (seq, variants, total_occurrences) in enumerate(
-            results, start=1
-        ):
-            header = f"{domain_name}_{variant_number}_{total_occurrences}"
-            out.write(f">{header}\n{seq}\n")
-    
-    
-    # Write CSV
-    with open(csv_out, "w") as out:
-        out.write(
-            "New_variant\tOccurrences\tSequence\tOriginal_variants\n"
+        results.append(
+            (seq, variants, total_occurrences)
         )
-    
-        for variant_number, (seq, variants, total_occurrences) in enumerate(
-            results, start=1
-        ):
-            new_variant = f"{domain_name}_{variant_number}"
+
+    # Sort variants by occurrence, highest first
+    results.sort(
+        key=lambda x: x[2],
+        reverse=True
+    )
+
+    # --------------------------------------------------
+    # Write FASTA
+    # --------------------------------------------------
+
+    with open(fasta_out, "w") as out:
+
+        for variant_number, (
+            seq,
+            variants,
+            total_occurrences
+        ) in enumerate(results, start=1):
+
+            header = (
+                f"{domain_name}_"
+                f"{variant_number}_"
+                f"{total_occurrences}"
+            )
+
+            out.write(
+                f">{header}\n"
+                f"{seq}\n"
+            )
+
+    # --------------------------------------------------
+    # Write CSV
+    # --------------------------------------------------
+
+    with open(csv_out, "w") as out:
+
+        out.write(
+            "New_variant\t"
+            "Occurrences\t"
+            "Sequence\t"
+            "Original_variants\n"
+        )
+
+        for variant_number, (
+            seq,
+            variants,
+            total_occurrences
+        ) in enumerate(results, start=1):
+
+            new_variant = (
+                f"{domain_name}_{variant_number}"
+            )
+
             original_variants = ",".join(variants)
-    
+
             out.write(
                 f"{new_variant}\t"
                 f"{total_occurrences}\t"
                 f"{seq}\t"
                 f"{original_variants}\n"
             )
-
-    with open(fasta_out, "w") as out:
-        for seq, header, total_occurrences in results:
-            out.write(f">{header}\n{seq}\n")
-    with open(csv_out, "w") as out:
-        for seq, header, total_occurrences in results:
-            out.write(f"\t{total_occurrences}\t{seq}\t{header}\n")
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Extract domain sequences from an aligned FASTA.")
