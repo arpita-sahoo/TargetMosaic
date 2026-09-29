@@ -66,9 +66,15 @@ def extract_domains_from_alignment(aligned_fasta, domain_positions, fasta_out, c
     for record in SeqIO.parse(aligned_fasta, "fasta"):
         header = record.id
         seq = str(record.seq)
-
-        # Extract all domain regions
-        extracted = "".join(seq[start - 1:end] for _, (start, end) in domain_positions.items())
+        
+        # Extract all domain regions using alignment coordinates
+        extracted = "".join(
+            seq[start - 1:end]
+            for _, (start, end) in domain_positions.items()
+        )
+        
+        # Remove alignment gaps before grouping
+        extracted = extracted.replace("-", "")
         grouped[extracted].append(header)
 
     results = []
