@@ -21,7 +21,7 @@ mkdir -p "$OUTDIR"
 NCHUNKS=16
 
 # Split SAMID.tsv into NCHUNKS roughly equal parts
-split -n l/$NCHUNKS SAMID.tsv chunk_
+split -n l/$NCHUNKS ../SAMID.tsv chunk_
 
 # Loop over each chunk and launch download in background
 for CHUNK in chunk_*; do
