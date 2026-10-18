@@ -34,8 +34,13 @@ git clone https://github.com/arpita-sahoo/TargetMosaic.git
 ## Environment setup  
 
 This repository requires a conda environment named `myenv`.  
-You can create it directly from the provided `environment.yml`:  
+You can create it directly from the provided `environment.yml`
 
+On the cluster, go to the compute node for environment installation:
+```bash
+srun --partition=standard --cpus-per-task=4 --mem=16G --time=02:00:00 --pty bash
+```
+Then create the environment using:
 ```bash
 module load miniforge3   # if on a cluster with modules
 conda env create -f environment.yml
