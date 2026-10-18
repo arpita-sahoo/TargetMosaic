@@ -88,7 +88,6 @@ dependencies:
   - libidn2=2.3.8
   - libjpeg-turbo=2.1.4
   - liblapack=3.9.0
-  - liblzma=5.6.4
   - libnghttp2=1.58.0
   - libnsl=2.0.1
   - libopenblas=0.3.28
@@ -277,7 +276,6 @@ dependencies:
   - xorg-libxi=1.8.2
   - xorg-libxrender=0.9.12
   - xorg-libxtst=1.2.5
-  - xz=5.2.6
   - zlib=1.2.13
   - zstandard=0.23.0
   - zstd=1.5.6
@@ -293,4 +291,3 @@ dependencies:
       - pyparsing==3.2.1
       - requests-mock==1.12.1
       - spatyper==0.3.3
-prefix: /home/asahoo/data/conda/envs/myenv
