@@ -11,7 +11,7 @@
 
 module load miniforge3
 # module load anaconda3
-source activate myenv
+source activate TargetMosaic-env
 
 # Stop script if a command fails
 set -e
