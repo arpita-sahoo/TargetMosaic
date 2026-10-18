@@ -11,7 +11,7 @@
 
 module load miniforge3
 # module load anaconda3
-source activate myenv
+source activate TargetMosaic-env
 
 # Download directory in current folder
 OUTDIR=./faa_files/
