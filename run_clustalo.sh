@@ -18,7 +18,7 @@ module load miniforge3
 
 # Conda activation in non-interactive SLURM shells may require conda.sh.
 source "$(conda info --base)/etc/profile.d/conda.sh"
-conda activate myenv
+conda activate TargetMosaic-env
 
 # Input and output files.
 INPUT="unique_seq.fasta"
