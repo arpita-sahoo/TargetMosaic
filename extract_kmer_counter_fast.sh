@@ -10,9 +10,7 @@ set -euo pipefail
 module load miniforge3
 source activate TargetMosaic-env
 
-# Run from the same working directory as your old submission.
-# Put extract_protein_kmer_fast.py in this directory, or update the path below.
-python extract_protein_kmer_fast.py \
+python TargetMosaic/extract_protein_kmer_fast.py \
     --input WT.fasta \
     --dir ./faa_files/ \
     --k 5 \
