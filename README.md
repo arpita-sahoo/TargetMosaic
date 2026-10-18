@@ -43,12 +43,12 @@ srun --partition=standard --cpus-per-task=4 --mem=16G --time=02:00:00 --pty bash
 Then create the environment using:
 ```bash
 module load miniforge3   # if on a cluster with modules
-conda env create -f environment.yml
+conda env create -f TargetMosaic/environment.yml
 conda activate TargetMosaic-env
 ```
 If the environment already exists, update it with:
 ```bash
-conda env update -f environment.yml --prune
+conda env update -f TargetMosaic/environment.yml --prune
 ```
 ### Alternative setup with pip  
 
@@ -57,7 +57,7 @@ If you prefer a lightweight installation, a `requirements.txt` is also provided:
 ```bash
 conda create -n TargetMosaic-env python=3.10
 conda activate TargetMosaic-env
-pip install -r requirements.txt
+pip install -r TargetMosaic/requirements.txt
 ```
 
 ### Email notification of job run completion  
