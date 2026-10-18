@@ -11,7 +11,7 @@
 
 module load miniforge3
 # module load anaconda3
-source activate myenv
+source activate TargetMosaic-env
 
 # thresholds to test
 thresholds=(0.10 0.25 0.50 0.75 0.90)
