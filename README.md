@@ -33,7 +33,7 @@ git clone https://github.com/arpita-sahoo/TargetMosaic.git
 ```
 ## Environment setup  
 
-This repository requires a conda environment named `myenv`.  
+This repository requires a conda environment named `TargetMosaic-env`.  
 You can create it directly from the provided `environment.yml`
 
 On the cluster, go to the compute node for environment installation:
@@ -44,7 +44,7 @@ Then create the environment using:
 ```bash
 module load miniforge3   # if on a cluster with modules
 conda env create -f environment.yml
-conda activate myenv
+conda activate TargetMosaic-env
 ```
 If the environment already exists, update it with:
 ```bash
@@ -55,8 +55,8 @@ conda env update -f environment.yml --prune
 If you prefer a lightweight installation, a `requirements.txt` is also provided:  
 
 ```bash
-conda create -n myenv python=3.10
-conda activate myenv
+conda create -n TargetMosaic-env python=3.10
+conda activate TargetMosaic-env
 pip install -r requirements.txt
 ```
 
@@ -119,13 +119,13 @@ This Workflow uses the bakrep-cli tool; hence, the SAM IDs must be compatible wi
 - Extract the SAM IDs using:
 ```bash
 module load miniforge3
-source activate myenv
+source activate TargetMosaic-env
 python TargetMosaic/extract_SAMid.py Pseudomonas aeruginosa
 ```
 Optionally with custom input/output:
 ```bash
 module load miniforge3
-source activate myenv
+source activate TargetMosaic-env
 python TargetMosaic/extract_SAMid.py Escherichia coli -i bakrep-export.tsv -o SAMID.tsv
 ```
 
@@ -201,7 +201,7 @@ Collapse identical sequences into unique variants, annotated with their occurren
 
 ```bash
 module load miniforge3
-source activate myenv
+source activate TargetMosaic-env
 python TargetMosaic/unique_seq.py matches.fasta
 ```
 
@@ -235,7 +235,7 @@ Where you can substitute `###` with your required identity threshold (e.g., 90).
 Once you have decided on your exclusion criteria, execute the following to exclude the entries:
 ```bash
 module load miniforge3
-source activate myenv
+source activate TargetMosaic-env
 python TargetMosaic/remove_fasta_entries.py unique_seq_aligned.fasta exclude.tsv unique_seq_aligned_new.fasta
 ```
 This will generate `unique_seq_aligned_new.fasta`, which can be used for subsequent analysis.
@@ -248,7 +248,7 @@ Extract and analyze specific functional domains from the aligned sequences:
 
 ```bash
 module load miniforge3
-source activate myenv
+source activate TargetMosaic-env
 python TargetMosaic/domain_extraction.py --aligned aligned.fasta --domains domains.fasta --reference Var1_x
 ```
 Replace `aligned.fasta` with the desired alignment fasta file
