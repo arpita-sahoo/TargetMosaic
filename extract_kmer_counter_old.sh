@@ -24,7 +24,7 @@ do
 
     echo "Running threshold $t"
 
-    python TargetMosaic/extract_protein_kmer.py \
+    python TargetMosaic/extract_protein_kmer_old.py \
         --input WT.fasta \
         --dir ./faa_files/ \
         --out_fasta matches_${t_label}.fasta \
