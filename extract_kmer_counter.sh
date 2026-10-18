@@ -2,12 +2,13 @@
 #SBATCH --job-name=extract_kmer_counter
 #SBATCH --output=extract_kmer_counter_%j.out
 #SBATCH --error=extract_kmer_counter_%j.err
+#SBATCH --time=48:00:00       # 2 days
+#SBATCH --cpus-per-task=32      # parallel processing
+#SBATCH --mem=128G               # increase memory
 #SBATCH --partition=standard
-#SBATCH --time=4-00:00:00
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=128G
 ##SBATCH --mail-user=user@example.com
 ##SBATCH --mail-type=BEGIN,END 
+
 
 module load miniforge3
 # module load anaconda3
