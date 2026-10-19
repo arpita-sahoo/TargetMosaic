@@ -186,7 +186,8 @@ Count number of strains without the target gene:
 awk -F'\t' '$2 == 0 {count++} END {print count}' counts.tsv
 ```
 This provides the number of strains without the target.  
-`$2 == 0` can be changed to `$2 == 1` to identify number of strains with one copy of the gene, and so on.
+`$2 == 0` can be changed to `$2 == 1` to identify the number of strains with one copy of the gene, and so on.
+At this stage, based on your protein of interest, you need to decide on an appropriate threshold. For instance, for essential proteins, you need to find the highest threshold that allows one copy per assembly.
 
 **Side Note:** If you are further interested in the sequences from the assemblies that have multiple copies of your target, you can try running the following:
 ```bash
@@ -206,8 +207,9 @@ Collapse identical sequences into unique variants, annotated with their occurren
 ```bash
 module load miniforge3
 source activate TargetMosaic-env
-python TargetMosaic/unique_seq.py matches.fasta
+python TargetMosaic/unique_seq.py matches_##.fasta
 ```
+Replace `##` with your threshold.
 
 Output:  
 - `unique_seq.fasta` – FASTA with headers in the form:  
@@ -253,10 +255,12 @@ Extract and analyze specific functional domains from the aligned sequences:
 ```bash
 module load miniforge3
 source activate TargetMosaic-env
-python TargetMosaic/domain_extraction.py --aligned aligned.fasta --domains domains.fasta --reference Var1_x
+python TargetMosaic/domain_extraction.py --aligned unique_seq_aligned.fasta --domains domains.fasta --reference Var1_x
 ```
-Replace `aligned.fasta` with the desired alignment fasta file
-Replace `Var1_x` with whichever variant header corresponds to the reference sequence
+Replace `unique_seq_aligned.fasta` with the desired alignment fasta file
+
+Replace `Var1_x` with whichever variant header corresponds to the reference sequence in the `>Var<variant_number>_<occurrence_count>` format
+
 Replace `domains.fasta` with a fasta file containing sequence(s) of the domain(s) of interest
 
 
