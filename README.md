@@ -55,11 +55,15 @@ conda env update -f TargetMosaic/environment.yml --prune
 If you prefer a lightweight installation, a `requirements.txt` is also provided:  
 
 ```bash
-conda create -n TargetMosaic-env python=3.10
+module load miniforge3
+conda create -n TargetMosaic-env python=3.10 pip
 conda activate TargetMosaic-env
 pip install -r TargetMosaic/requirements.txt
 ```
-
+The following additional command installs the non-Python dependencies that pip cannot install:
+```bash
+conda install -c conda-forge -c bioconda clustalo seqkit rsync
+```
 ### Email notification of job run completion  
 
 If you prefer to be notified when the Slurm jobs are complete, feel free to change `user@example.com` to your email in the 3 Slurm scripts: `download_single.sh`, `flatten_copy.sh`, `extract_kmer_counter.sh`
