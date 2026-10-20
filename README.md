@@ -152,7 +152,7 @@ After downloads finish, flatten the directory structure.
 
 ```bash
 cd faa_files
-sbatch ../../TargetMosaic/flatten_copy.sh
+sbatch ../../TargetMosaic/flatten_directory.sh
 ```
 ## Step 3. Target gene identification and coverage analysis  
 
