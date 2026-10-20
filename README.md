@@ -122,10 +122,9 @@ This Workflow uses the bakrep-cli tool; hence, the SAM IDs must be compatible wi
 - Click `Export as TSV` and upload the exported metadata TSV file(bakrep-export.tsv) into your working directory
 - Extract the SAM IDs using:
 ```bash
-module load miniforge3
-source activate TargetMosaic-env
-python TargetMosaic/extract_SAMid.py Pseudomonas aeruginosa
+tail -n +2 bakrep-export.tsv | cut -f1 | sort -u > SAMID.tsv
 ```
+
 Optionally with custom input/output:
 ```bash
 module load miniforge3
