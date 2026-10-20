@@ -15,4 +15,4 @@ DEST="../../faa_files"
 mkdir -p "$DEST"
 
 # Flatten everything into one folder, skip if file already exists
-find . -type f -exec rsync --ignore-existing {} "$DEST" \;
+find . -type f -exec mv -n -t "$DEST" -- {} +
