@@ -182,11 +182,13 @@ However, this can be changed if needed in `extract_kmer_counter.sh`
 ### Summarize species coverage
 Count number of strains without the target gene:
 ```bash
-awk -F'\t' '$2 == 0 {count++} END {print count}' counts.tsv
+awk -F'\t' '$2 == 0 {count++} END {print count}' counts_##.tsv
 ```
-This provides the number of strains without the target.  
+Replace `##` with different thresholds. This provides the number of strains without the target for that particular threshold.  
 `$2 == 0` can be changed to `$2 == 1` to identify the number of strains with one copy of the gene, and so on.
-At this stage, based on your protein of interest, you need to decide on an appropriate threshold. For instance, for essential proteins, you need to find the highest threshold that allows one copy per assembly.
+
+At this stage, based on your protein of interest, you need to decide on an appropriate threshold. For instance, for essential proteins, you need to find the highest threshold that allows one copy per assembly. For proteins known to have a single copy in the genome, look for the lowest threshold that allows at most one copy per assembly. Every target is different, and you are the best judge for your target.
+
 
 **Side Note:** If you are further interested in the sequences from the assemblies that have multiple copies of your target, you can try running the following:
 ```bash
